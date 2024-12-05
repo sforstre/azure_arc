@@ -40,9 +40,13 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Location to deploy resources')
+@description('Location to deploy Arc resources')
 @allowed(['eastus', 'westeurope', 'australiaeast'])
 param location string
+
+@description('Location to deploy VM Host resources')
+@allowed(['westus2', 'canadacentral', 'australiaeast'])
+param boxlocation string
 
 @description('Override default RDP port using this parameter. Default is 3389.')
 param rdpPort string = '3389'
@@ -77,6 +81,7 @@ module networkDeployment 'network/network.bicep' = {
   params: {
     deployBastion: deployBastion
     location: location
+    boxlocation: boxlocation
   }
 }
 
@@ -105,6 +110,7 @@ module hostDeployment 'host/host.bicep' = {
     deployBastion: deployBastion
     natDNS: natDNS
     location: location
+    boxlocation: boxlocation
     rdpPort: rdpPort
     autoDeployClusterResource: autoDeployClusterResource
     autoUpgradeClusterResource: autoUpgradeClusterResource

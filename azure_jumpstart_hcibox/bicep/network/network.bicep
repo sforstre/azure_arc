@@ -7,6 +7,9 @@ param subnetName string = 'HCIBox-Subnet'
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
 
+@description('Location for HCI clientbox')
+param boxlocation string
+
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
@@ -26,7 +29,7 @@ var bastionPublicIpAddressName = '${bastionName}-PIP'
 
 resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
-  location: location
+  location: boxlocation
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -72,7 +75,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
-  location: location
+  location: boxlocation
   properties: {
     securityRules: [
       
@@ -82,7 +85,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
 
 resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
-  location: location
+  location: boxlocation
   properties: {
     securityRules: [
       {
@@ -207,7 +210,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
 
 resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
-  location: location
+  location: boxlocation
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -220,7 +223,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (
 
 resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBastion == true) {
   name: bastionName
-  location: location
+  location: boxlocation
   properties: {
     ipConfigurations: [
       {

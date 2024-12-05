@@ -16,6 +16,9 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Location for HCI clientbox')
+param boxlocation string
+
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
@@ -80,7 +83,7 @@ var PublicIPNoBastion = {
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
-  location: location
+  location: boxlocation
   properties: {
     ipConfigurations: [
       {
@@ -99,7 +102,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
   name: publicIpAddressName
-  location: location
+  location: boxlocation
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -112,7 +115,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
 
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
-  location: location
+  location: boxlocation
   tags: resourceTags
   properties: {
     hardwareProfile: {
@@ -247,7 +250,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
 resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
   parent: vm
   name: 'Bootstrap'
-  location: location
+  location: boxlocation
   properties: {
     publisher: 'Microsoft.Compute'
     type: 'CustomScriptExtension'
